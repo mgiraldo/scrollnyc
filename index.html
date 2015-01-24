@@ -20,6 +20,11 @@ $(function() {
   // global vars
   var winWidth = $(window).width();
   var winHeight = $(window).height();
+  var photoWidth = 1053;
+  var photoHeight = 2130;
+  var big = false, ratio = photoWidth/winWidth;
+  var minPct = 0, maxPct = 100;
+  var pickY = 0, basePct = 0, dragging = false;
 
   // set initial div height / width
   $('.intro').css({
@@ -32,9 +37,66 @@ $(function() {
       winWidth = $(window).width();
       winHeight = $(window).height();
       $('.intro').css({
-      'width': winWidth,
-      'height': winHeight,
+        'width': winWidth,
+        'height': winHeight,
+      });
+      ratio = photoWidth/winWidth;
   });
+
+  $(window).scroll(function() {
+    var win = $(window);
+    var last = $('.intro').last();
+    if (win.scrollTop() > win.height() && win.scrollTop() < last.offset().top - last.height()) {
+      $('.control').fadeIn();
+    } else {
+      $('.control').fadeOut();
+    }
+  });
+
+
+  $('#toggle').click(function(e){
+    e.preventDefault();
+    big = !big;
+    if (big) {
+      var html = '<span>drag to pan</span>';
+      $('.control').append(html);
+      $('#toggle').text('SHRINK');
+      $('.map').css('background-size','100% auto');
+    } else {
+      $('.control').find('span').remove();
+      $('#toggle').text('EMBIGGEN');
+      $('.map').css('background-size','auto 100%');
+    }
+  });
+
+  $(window).mousedown(function(e){
+    var target = $( e.target );
+    if (target.is(".map") && big) {
+      e.stopPropagation();
+      pickY = e.pageY;
+      var cssPos = $(".map").first().css("background-position");
+      basePct = parseFloat(cssPos.split(" ")[1]);
+      dragging = true;
+    }
+  });
+
+  $(window).mousemove(function(e){
+    var target = $( e.target );
+    if (dragging && big) {
+      var newY = e.pageY;
+      var deltaY = newY - pickY;
+      var deltaPct = 100 * deltaY / photoHeight;
+      var pct = basePct - deltaPct;
+      if (pct > maxPct) pct = maxPct;
+      if (pct < minPct) pct = minPct;
+      // console.log("delta", deltaY, "ratio", ratio, "basePct", basePct, "deltaPct", deltaPct, "pct", pct);
+      var pos = '50% ' + pct + '%';
+      $('.map').css('background-position',pos);
+    }
+  });
+
+  $(window).mouseup(function(e){
+    dragging = false;
   });
 });
     </script>
@@ -61,6 +123,37 @@ $(function() {
     font-weight: bold;
   }
 
+  .control {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    z-index: 1;
+    display: none;
+  }
+
+  #toggle {
+    box-shadow: 0 0 3px #424242;
+  }
+
+  .control span {
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 0 0 3px #424242;
+  }
+
+  .control a {
+    display: block;
+    width: 130px;
+    background: none repeat scroll 0% 0% #efefef;
+    padding: 15px 0px;
+    border-radius: 15px;
+  }
+
+  .control a:hover {
+    color: #efefef;
+    background-color: #ED7E21;
+  }
+
   .intro {
     position: relative;
     background-color: rgb(222, 216, 200);
@@ -77,11 +170,12 @@ $(function() {
     font-size: 3em;
     color: #fff;
     text-shadow: none;
-  }
-
-  h2.bottom {
-    position: absolute;
-    bottom: 20px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 
   path {
@@ -109,6 +203,17 @@ $(function() {
   .map h2 {
     position: absolute;
     text-align: left;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  h2.bottom {
+    position: absolute;
+    bottom: 20px;
   }
 
   h2.top:before, h2.bottom:before {
@@ -290,6 +395,7 @@ $(function() {
 <!-- /svg -->
       </div>
     </div>
+    <div class="control"><a href="#" id="toggle">EMBIGGEN</a></div>
     <div id="map2014" class="map" ><h2 class="top">2014</h2><h2 class="bottom">2014</h2></div>
     <div id="map1921" class="map" ><h2 class="top">1921</h2><h2 class="bottom">1921</h2></div>
     <div id="map1920" class="map" ><h2 class="top">1920</h2><h2 class="bottom">1920</h2></div>
