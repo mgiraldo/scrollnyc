@@ -1,3 +1,3 @@
 # Scroll NYC
 
-Repository for the [Scroll NYC web page](http://bit.ly/scrollnyc).
+Repository for the [Scroll NYC web page](http://mgiraldo.github.io/scrollnyc).
