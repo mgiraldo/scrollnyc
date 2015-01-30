@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!--
+
+  Everything in a single HTML page because why not?
+
+  -->
 <html>
   <head>
     <meta charset="utf-8">
@@ -26,6 +31,92 @@ $(function() {
   var minPct = 0, maxPct = 100;
   var pickY = 0, basePct = 0, dragging = false;
 
+  var isdevice = (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()));
+
+  if (isdevice) {
+    $(".control").remove();
+    initMaps();
+    mapBackground();
+  }
+
+  function initMaps() {
+    if (!isdevice) return;
+    $(".intro").first().css({background:"transparent"});
+    $("h2.bottom").remove();
+    var maps = $(".map");
+    var map, l = maps.length;
+    var container = $(".container");
+    var main = $("#maps");
+    main.css({
+      position: "absolute",
+      left: 0,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: -1
+    })
+
+    var winw = $(window).width();
+    var ratio = winw/460; // from the img size
+    container.height(930*ratio*(maps.length+2));
+
+    maps.css({
+      position: "absolute"
+      ,backgroundAttachment: "scroll"
+      ,backgroundSize: "cover"
+      ,opacity: 1
+      ,top: 0
+    });
+
+    for (var i=0;i<l;i++) {
+      map = $(maps[i]);
+      map.css({zIndex:l-i});
+    }
+  }
+
+  function mapBackground() {
+    if (!isdevice) return;
+    var wintop = $(window).scrollTop();
+    var winw = $(window).width();
+    var winh = $(window).height();
+    var bodyh = $("body").height();
+    var main = $("#maps");
+    var maps = $(".map");
+
+    var ratio = winw/460; // from the img size
+    main.width(winw);
+    main.height(winh);
+    main.css({
+      position: "fixed"
+    });
+    maps.width(winw);
+    maps.height(930*ratio);
+
+    var position = wintop / bodyh;
+
+    var map, l = maps.length;
+
+    var shown = l * position;
+
+    var mapshown = Math.floor(shown);
+
+    var opacity = 1 - parseFloat("." + shown.toFixed(2).split(".")[1]);
+
+    if (mapshown<0) mapshown = 0;
+    if (mapshown>=l) mapshown = l-1;
+
+    for (var i=0;i<l;i++) {
+      map = $(maps[i]);
+      if (i == mapshown) {
+        map.css({opacity:opacity});
+      } else if (i == mapshown+1) {
+        map.css({opacity:1});
+      } else {
+        map.css({opacity:0});
+      }
+    }
+  }
+
   // set initial div height / width
   $('.intro').css({
     'width': winWidth,
@@ -34,16 +125,18 @@ $(function() {
 
   // make sure div stays full width/height on resize
   $(window).resize(function(){
-      winWidth = $(window).width();
-      winHeight = $(window).height();
-      $('.intro').css({
-        'width': winWidth,
-        'height': winHeight,
-      });
-      ratio = photoWidth/winWidth;
+    mapBackground();
+    winWidth = $(window).width();
+    winHeight = $(window).height();
+    $('.intro').css({
+      'width': winWidth,
+      'height': winHeight,
+    });
+    ratio = photoWidth/winWidth;
   });
 
   $(window).scroll(function() {
+    mapBackground();
     var win = $(window);
     var last = $('.intro').last();
     if (win.scrollTop() > win.height() && win.scrollTop() < last.offset().top - last.height()) {
@@ -99,6 +192,24 @@ $(function() {
     dragging = false;
   });
 });
+
+var metas = document.getElementsByTagName('meta');
+var i;
+if (navigator.userAgent.match(/iPhone/i)) {
+  for (i=0; i<metas.length; i++) {
+    if (metas[i].name == "viewport") {
+      metas[i].content = "width=device-width, minimum-scale=1.0, maximum-scale=1.0";
+    }
+  }
+  document.addEventListener("gesturestart", gestureStart, false);
+}
+function gestureStart() {
+  for (i=0; i<metas.length; i++) {
+    if (metas[i].name == "viewport") {
+      metas[i].content = "width=device-width, minimum-scale=0.25, maximum-scale=1.6";
+    }
+  }
+}
     </script>
   </head>
   <style type="text/css">
@@ -395,20 +506,23 @@ $(function() {
 <!-- /svg -->
       </div>
     </div>
-    <div class="control"><a href="#" id="toggle">EMBIGGEN</a></div>
-    <div id="map2014" class="map" ><h2 class="top">2014</h2><h2 class="bottom">2014</h2></div>
-    <div id="map1921" class="map" ><h2 class="top">1921</h2><h2 class="bottom">1921</h2></div>
-    <div id="map1920" class="map" ><h2 class="top">1920</h2><h2 class="bottom">1920</h2></div>
-    <div id="map1913" class="map" ><h2 class="top">1913</h2><h2 class="bottom">1913</h2></div>
-    <div id="map1878" class="map" ><h2 class="top">1878</h2><h2 class="bottom">1878</h2></div>
-    <div id="map1857" class="map" ><h2 class="top">1857</h2><h2 class="bottom">1857</h2></div>
-    <div id="map1849" class="map" ><h2 class="top">1849</h2><h2 class="bottom">1849</h2></div>
-    <div id="map1841" class="map" ><h2 class="top">1841</h2><h2 class="bottom">1841</h2></div>
-    <div id="map1830" class="map" ><h2 class="top">1830</h2><h2 class="bottom">1830</h2></div>
-    <div id="map1817" class="map" ><h2 class="top">1817</h2><h2 class="bottom">1817</h2></div>
-    <div id="map1797" class="map" ><h2 class="top">1797</h2><h2 class="bottom">1797</h2></div>
-    <div id="map1766" class="map" ><h2 class="top">1766</h2><h2 class="bottom">1766</h2></div>
-    <div id="map1660" class="map" ><h2 class="top">1660</h2><h2 class="bottom">1660</h2></div>
+    <div class="container"></div>
+    <div id="maps">
+      <div class="control"><a href="#" id="toggle">EMBIGGEN</a></div>
+      <div id="map2014" class="map" ><h2 class="top">2014</h2><h2 class="bottom">2014</h2></div>
+      <div id="map1921" class="map" ><h2 class="top">1921</h2><h2 class="bottom">1921</h2></div>
+      <div id="map1920" class="map" ><h2 class="top">1920</h2><h2 class="bottom">1920</h2></div>
+      <div id="map1913" class="map" ><h2 class="top">1913</h2><h2 class="bottom">1913</h2></div>
+      <div id="map1878" class="map" ><h2 class="top">1878</h2><h2 class="bottom">1878</h2></div>
+      <div id="map1857" class="map" ><h2 class="top">1857</h2><h2 class="bottom">1857</h2></div>
+      <div id="map1849" class="map" ><h2 class="top">1849</h2><h2 class="bottom">1849</h2></div>
+      <div id="map1841" class="map" ><h2 class="top">1841</h2><h2 class="bottom">1841</h2></div>
+      <div id="map1830" class="map" ><h2 class="top">1830</h2><h2 class="bottom">1830</h2></div>
+      <div id="map1817" class="map" ><h2 class="top">1817</h2><h2 class="bottom">1817</h2></div>
+      <div id="map1797" class="map" ><h2 class="top">1797</h2><h2 class="bottom">1797</h2></div>
+      <div id="map1766" class="map" ><h2 class="top">1766</h2><h2 class="bottom">1766</h2></div>
+      <div id="map1660" class="map" ><h2 class="top">1660</h2><h2 class="bottom">1660</h2></div>
+    </div>
     <div class="intro" >
       <div>
         <p>
